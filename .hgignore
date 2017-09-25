@@ -1,0 +1,16 @@
+syntax: glob
+
+*.db
+*.png
+*.pyc
+*.pyo
+*.so
+ga/*.pyc
+ga/*.pyo
+ga/*.so
+*~
+*.class
+results/
+*.aux
+*.log
+*.tex
