@@ -1,3 +1,4 @@
+from __future__ import division, print_function
 import numpy as np
 from math import pi
 import networkx as nx
@@ -138,29 +139,44 @@ def plot_slot_v_generation_sqlite(dbname, id):
     c.close()
     conn.close()
 
+def _get_num_generations(dbname, id):
+    with sqlite3.connect(dbname) as conn:
+        c = conn.cursor()
+        retrieve_query = "SELECT id, generation, slots, genome FROM best_individuals WHERE id=?"
+        return len(c.execute(retrieve_query, (id,)).fetchall())
 
+def _get_num_records(dbname, base_id):
+    with sqlite3.connect(dbname) as conn:
+        c = conn.cursor()
+        retrieve_query = "SELECT id FROM best_individuals WHERE id LIKE ?"
+        result = c.execute(retrieve_query, (base_id + "_%",)).fetchall()
+        return len(result)
 
-# def plot_slot_v_generation(dbname, ids, generations):
-    # generation_sums = 0
-    # conn = sqlite3.connect(dbname)
-    # c = conn.cursor()
-    # for base_id in ids:
-        # for id in [ base_id + str(i) for i in xrange(generations) ]:
-            # generation_count = 0
-            # retrieve_query = "SELECT id, generation, slots, genome FROM best_individuals WHERE id=? ORDER BY generation ASC"
-            # query_result = c.execute(retrieve_query, (id,))
-            # generation_sums = [ 0 for i in xrange(len(query_result)) ]
-            # for row in c.execute(retrieve_query, (id,)):
-                # generation_sums[int(row[1])] += int(row[2])
-        # generations_avg = [ i/generations for i in generation_sums ]
+def plot_slot_v_generation_avg_sqlite(dbname, ids):
+    conn = sqlite3.connect(dbname)
+    c = conn.cursor()
+    base_query = "SELECT id, generation, slots FROM best_individuals WHERE generation=?"
+    fig = plt.figure()
+    fig.patch.set_facecolor('white')
+    for base_id in ids:
+        slots = []
+        num_generations = _get_num_generations(dbname, base_id + "0")
+        retrieve_query = base_query + " AND id LIKE ?"
+        for g in xrange(num_generations):
+            result = c.execute(retrieve_query, (g, base_id + "_%")).fetchall()
+            num_records = len(result)
+            generation_sum = 0
+            for row in result:
+                generation_sum += int(row[2])
+            slots.append(generation_sum/num_records)
+        plt.plot(xrange(num_generations), slots, label=base_id, alpha=1.0)
 
-    # c.close()
-    # conn.close()
+    plt.legend()
+    plt.grid(True)
+    fig.show()
+    c.close()
+    conn.close()
 
-    # # For each run record, retrieve slots used
-    # # Average each generation across runs
-    # # Plot average total slot against generation
-    # return
 
 def _circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
     """

@@ -75,6 +75,10 @@ def main_plot_slots(args):
     plot.plot_slot_v_generation_sqlite(args.database, args.identity)
     raw_input("Enter to continue...")
 
+def main_plot_slots_avg(args):
+    plot.plot_slot_v_generation_avg_sqlite(args.database, args.identities)
+    raw_input("Enter to continue...")
+
 def main_c_header(args):
     header_content = generate_c_header(args.database, args.identity)
     args.output_file.write(header_content)
@@ -140,6 +144,15 @@ if __name__ == "__main__":
     plot_slots_parser = plot_subparsers.add_parser('slots', help="Generations vs total slots")
     identity_args(plot_slots_parser)
     plot_slots_parser.set_defaults(func=main_plot_slots)
+
+    plot_slots_avg_parser = plot_subparsers.add_parser('slots-average', help="Generations vs total slots averaged over a number of runs")
+    plot_slots_avg_parser.add_argument('-db', '--database', action='store', type=unicode, required=False, default='evolution.db',
+                help='The SQLite3 database where results will be stored (default="evolution.db")')
+    plot_slots_avg_parser.add_argument('-ids', '--identities', action='store', nargs='+', type=str, required=False, default=[''],
+                help='The IDs that are used to retrieve records from the database')
+    # plot_slots_avg_parser.add_argument('-g', '--generations', action='store', type=int, required=False, default=100,
+                # help='The number of generations to plot')
+    plot_slots_avg_parser.set_defaults(func=main_plot_slots_avg)
 
     c_header_parser = subparsers.add_parser('c-header', help='Output a C header file containing the necessary details to be implemented')
     identity_args(c_header_parser)
