@@ -20,112 +20,6 @@ from ga.header import generate_c_header
 from ga.fitness import get_fitness_choices
 
 
-# def generate_initial_grid(size=11):
-    # g = nx.grid_2d_graph(size, size)
-    # g.graph["size"] = 11
-    # g.graph["sink"] = (5,5)
-    # g.graph["source"] = (0,0)
-    # for n in g.nodes_iter():
-        # g.node[n]["slot"] = 0
-    # return g
-
-def main():
-    topology = GridTopology(11, 11)
-    g_template = genome.get_template_genome(topology)
-    g = g_template.clone()
-    genome.initialise(g)
-    # test.das(g)
-    # test.collisions(g)
-    # plot_network(g)
-    # raw_input("Enter to continue...")
-    # return
-    g2 = g_template.clone()
-    genome.initialise(g2)
-    # plot_network(g2)
-    # raw_input("Enter to continue...")
-    son, daughter = genome.crossover(g_template, dad=g, mom=g2)
-    genome.mutate(son, ga_engine=None, pmut=0.1)
-    genome.mutate(daughter, ga_engine=None, pmut=0.1)
-    print("Testing DAS...")
-    print("Son:-")
-    if not test.das(son):
-        plot_network(son)
-        raw_input("Enter to continue...")
-    print("Daughter:-")
-    if not test.das(daughter):
-        plot_network(daughter)
-        raw_input("Enter to continue...")
-    print("Testing collisions...")
-    print("Son:-")
-    if not test.collisions(son):
-        plot_network(son)
-        raw_input("Enter to continue...")
-    print("Daughter:-")
-    if not test.collisions(daughter):
-        plot_network(daughter)
-        raw_input("Enter to continue...")
-    genome.fitness(g)
-
-def main2():
-    topology = GridTopology(11, 11)
-    g_template = genome.get_template_genome(topology)
-    # for i in xrange(1000):
-        # print(i)
-        # g = g_template.clone()
-        # genome.initialise(g)
-        # test.collisions(g)
-        # test.das(g)
-    # return
-    # for i in xrange(1000):
-        # print(i)
-        # g = g_template.clone()
-        # genome.initialise(g)
-        # genome.mutate(g, ga_engine=None, pmut=0.1)
-        # test.collisions(g)
-        # test.das(g)
-    # return
-    # for i in xrange(1000):
-        # print(i)
-        # g1 = g_template.clone()
-        # g2 = g_template.clone()
-        # genome.initialise(g1)
-        # genome.initialise(g2)
-        # g3, g4 = genome.crossover(g_template, dad=g1, mom=g2)
-        # test.collisions(g3)
-        # test.das(g3)
-    # return
-    ga = engine.get_engine(g_template)
-    ga.evolve(freq_stats=1)
-    g = ga.bestIndividual()
-    print("Raw Score: {}".format(g.getRawScore()))
-    print("Slots Used: {}".format(genome.get_slots_used(g)))
-    # test.das(g)
-    # test.collisions(g)
-    test.collisions(g)
-    test.das(g)
-    genome.normalise_slots(g)
-    plot.plot_network(g)
-    raw_input("Enter to continue...")
-
-def main3():
-    topology = GridTopology(11, 11)
-    genomes = [ genome.get_template_genome(topology) ]
-    generations = [100]
-    elitism = [0, 1, 4, 8, 12, 16, 20]
-    mutation = [0.0, 0.01, 0.02, 0.05, 0.1]
-    crossover = [1.0, 0.95, 0.9]
-    repeats = 100
-    ga_engine_params = itertools.product(genomes, generations, elitism, mutation, crossover)
-    print("Elitism | Mutation | Crossover | Slots")
-    for params in ga_engine_params:
-        slots = []
-        for i in xrange(repeats):
-            ga = engine.get_engine_with_params(*params)
-            ga.evolve(freq_stats=0)
-            g = ga.bestIndividual()
-            slots.append(genome.get_slots_used(g))
-        print("{0[2]:7} | {0[3]:8.8} | {0[4]:9.9} | {1:5.5}".format(params, sum(slots)/len(slots)))
-
 def main_run(args):
     g_template = genome.get_template_genome(args.topology, args.fitness)
     g_template.n.graph['safety-period'] = args.safety_period
@@ -147,7 +41,23 @@ def main_run_multiple(args):
         print("")
 
 def main_optimise_parameters(args):
-    return
+    topology = GridTopology(11, 11)
+    genomes = [ genome.get_template_genome(topology) ]
+    generations = [100]
+    elitism = [0, 1, 4, 8, 12, 16, 20]
+    mutation = [0.0, 0.01, 0.02, 0.05, 0.1]
+    crossover = [1.0, 0.95, 0.9]
+    repeats = 100
+    ga_engine_params = itertools.product(genomes, generations, elitism, mutation, crossover)
+    print("Elitism | Mutation | Crossover | Slots")
+    for params in ga_engine_params:
+        slots = []
+        for i in xrange(repeats):
+            ga = engine.get_engine_with_params(*params)
+            ga.evolve(freq_stats=0)
+            g = ga.bestIndividual()
+            slots.append(genome.get_slots_used(g))
+        print("{0[2]:7} | {0[3]:8.8} | {0[4]:9.9} | {1:5.5}".format(params, sum(slots)/len(slots)))
 
 def main_plot_network(args):
     plot.plot_network_sqlite(args.database, args.identity)
@@ -171,12 +81,6 @@ def main_c_header(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate an SLP-aware DAS schedule')
-    # parser.add_argument('-db', '--database', action='store', type=unicode, required=False, default='evolution.db',
-            # help='The SQLite3 database where results will be stored (default="evolution.db")')
-    # parser.add_argument('-id', '--identity', action='store', type=str, required=False, default='',
-            # help='The ID that database records will be given (default="")')
-    # parser.add_argument('-v', '--verbose', action='store_true', required=False,
-            # help='Increase verbosity')
     subparsers = parser.add_subparsers(title='Subcommands')
 
     def identity_args(parser):
@@ -246,7 +150,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     #Extra processing for all options
-    if os.path.isfile(args.database) and not os.access(args.database, os.R_OK | os.W_OK):
-        raise IOError('Database "{}" does not have read and write permissions'.format(args.database))
+    try:
+        if os.path.isfile(args.database) and not os.access(args.database, os.R_OK | os.W_OK):
+            raise IOError('Database "{}" does not have read and write permissions'.format(args.database))
+    except AttributeError:
+        pass
 
     args.func(args)
