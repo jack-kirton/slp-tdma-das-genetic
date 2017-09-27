@@ -59,24 +59,19 @@ def main_optimise_parameters(args):
             slots.append(genome.get_slots_used(g))
         print("{0[2]:7} | {0[3]:8.8} | {0[4]:9.9} | {1:5.5}".format(params, sum(slots)/len(slots)))
 
-def main_plot_network(args):
-    plot.plot_network_sqlite(args.database, args.identity)
-    raw_input("Enter to continue...")
-
-def main_plot_animate(args):
-    plot.plot_network_animate_sqlite(args.database, args.identity)
-    raw_input("Enter to continue...")
-
-def main_plot_fitness(args):
-    plot.plot_generations_sqlite(args.database, args.identity)
-    raw_input("Enter to continue...")
-
-def main_plot_slots(args):
-    plot.plot_slot_v_generation_sqlite(args.database, args.identity)
-    raw_input("Enter to continue...")
-
-def main_plot_slots_avg(args):
-    plot.plot_slot_v_generation_avg_sqlite(args.database, args.identities)
+def main_plot(args):
+    if args.plot_type == "network":
+        plot.plot_network_sqlite(args.database, args.identity)
+    elif args.plot_type == "animate":
+        plot.plot_network_animate_sqlite(args.database, args.identity)
+    elif args.plot_type == "fitness":
+        plot.plot_generations_sqlite(args.database, args.identity)
+    elif args.plot_type == "slots":
+        plot.plot_slot_v_generation_sqlite(args.database, args.identity)
+    elif args.plot_type == "slots-average":
+        plot.plot_slot_v_generation_avg_sqlite(args.database, args.identities)
+    else:
+        raise RuntimeError("Unknown plot type")
     raw_input("Enter to continue...")
 
 def main_c_header(args):
@@ -127,32 +122,30 @@ if __name__ == "__main__":
     #TODO: Optimise parameters arguments
 
     plot_parser = subparsers.add_parser('plot', help='Create plots of specified run')
-    plot_subparsers = plot_parser.add_subparsers(title='Plots')
+    plot_subparsers = plot_parser.add_subparsers(title='Plots', dest='plot_type')
 
     plot_network_parser = plot_subparsers.add_parser('network', help="Graphical representation of a solution")
     identity_args(plot_network_parser)
-    plot_network_parser.set_defaults(func=main_plot_network)
+    plot_network_parser.set_defaults(func=main_plot)
 
     plot_animate_parser = plot_subparsers.add_parser('animate', help="Animate through generations of a solution")
     identity_args(plot_animate_parser)
-    plot_animate_parser.set_defaults(func=main_plot_animate)
+    plot_animate_parser.set_defaults(func=main_plot)
 
     plot_fitness_parser = plot_subparsers.add_parser('fitness', help="Generations vs fitness")
     identity_args(plot_fitness_parser)
-    plot_fitness_parser.set_defaults(func=main_plot_fitness)
+    plot_fitness_parser.set_defaults(func=main_plot)
 
     plot_slots_parser = plot_subparsers.add_parser('slots', help="Generations vs total slots")
     identity_args(plot_slots_parser)
-    plot_slots_parser.set_defaults(func=main_plot_slots)
+    plot_slots_parser.set_defaults(func=main_plot)
 
     plot_slots_avg_parser = plot_subparsers.add_parser('slots-average', help="Generations vs total slots averaged over a number of runs")
     plot_slots_avg_parser.add_argument('-db', '--database', action='store', type=unicode, required=False, default='evolution.db',
                 help='The SQLite3 database where results will be stored (default="evolution.db")')
     plot_slots_avg_parser.add_argument('-ids', '--identities', action='store', nargs='+', type=str, required=False, default=[''],
                 help='The IDs that are used to retrieve records from the database')
-    # plot_slots_avg_parser.add_argument('-g', '--generations', action='store', type=int, required=False, default=100,
-                # help='The number of generations to plot')
-    plot_slots_avg_parser.set_defaults(func=main_plot_slots_avg)
+    plot_slots_avg_parser.set_defaults(func=main_plot)
 
     c_header_parser = subparsers.add_parser('c-header', help='Output a C header file containing the necessary details to be implemented')
     identity_args(c_header_parser)
