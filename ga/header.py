@@ -7,6 +7,7 @@ c_header_template = """/*
  * GENERATED HEADER FILE
  * Database: {dbname}
  * Identity: {id}
+ * Generations: {generations}
  */
 
 #ifndef GA_H
@@ -44,6 +45,7 @@ def generate_c_header(dbname, id):
     output = {}
     output['dbname'] = dbname
     output['id'] = id
+    output['generations'] = generations
     output['total_nodes'] = len(n.nodes())
     output['total_slots'] = slots
     output['source_id'] = n.graph['source']

@@ -109,5 +109,5 @@ def sqlite_retrieve_best_genome(dbname, id):
     row = c.fetchone()
     g = pickle.loads(str(row[3]))
     conn.close()
-    return g, row[1], row[2]
+    return g, int(row[1]) + 1, int(row[2])
 
