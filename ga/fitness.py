@@ -33,6 +33,11 @@ def slot_fitness(genome):
         return 0.0
     return _slot_fitness(genome)
 
+def path_dist_fitness(genome):
+    if not _basic_fitness(genome):
+        return 0.0
+    return _path_dist_from_src_fitness(genome)
+
 def slot_and_path_dist_fitness(genome):
     if not _basic_fitness(genome):
         return 0.0
@@ -41,5 +46,6 @@ def slot_and_path_dist_fitness(genome):
 
 _fitness_functions = {
         'slot':                 slot_fitness,
+        'path-dist':            path_dist_fitness,
         'slot-with-path-dist':  slot_and_path_dist_fitness
         }

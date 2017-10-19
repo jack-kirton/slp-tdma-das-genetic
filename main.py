@@ -20,6 +20,34 @@ from ga.header import generate_c_header
 from ga.fitness import get_fitness_choices
 
 
+def main_special(args):
+    g_template = genome.get_template_genome(topology.GridTopology(7,7), 'slot')
+    # father = g_template.clone()
+    # mother = g_template.clone()
+    # genome.initialise(father)
+    # genome.initialise(mother)
+    # son, daughter = genome.crossover(None, dad=father, mom=mother)
+    # # genome.normalise_slots(father)
+    # # genome.normalise_slots(mother)
+    # # genome.normalise_slots(son)
+    # # genome.normalise_slots(daughter)
+    # plot.plot_network(father)
+    # raw_input("Enter to continue...")
+    # plot.plot_network(mother)
+    # raw_input("Enter to continue...")
+    # plot.plot_network(son)
+    # raw_input("Enter to continue...")
+    # plot.plot_network(daughter)
+    # raw_input("Enter to continue...")
+    g = g_template.clone()
+    genome.initialise(g)
+    g_mutate = g.clone()
+    print("Mutated {} nodes".format(genome.mutate(g_mutate, pmut=0.2)))
+    plot.plot_network(g)
+    raw_input("Enter to continue...")
+    plot.plot_network(g)
+    raw_input("Enter to continue...")
+
 def main_run(args):
     g_template = genome.get_template_genome(args.topology, args.fitness)
     g_template.n.graph['safety-period'] = args.safety_period
@@ -70,6 +98,8 @@ def main_plot(args):
         plot.plot_slot_v_generation_sqlite(args.database, args.identity)
     elif args.plot_type == "slots-average":
         plot.plot_slot_v_generation_avg_sqlite(args.database, args.identities)
+    elif args.plot_type == "pareto":
+        plot.plot_pareto_sqlite(args.database, ['slot', 'path-dist'])
     else:
         raise RuntimeError("Unknown plot type")
     raw_input("Enter to continue...")
@@ -102,6 +132,9 @@ if __name__ == "__main__":
                 help='The safety period (in TDMA periods)')
         parser.add_argument('-g', '--generations', action='store', type=int, required=False, default=100,
                 help='The number of generations to iterate for')
+
+    special_parser = subparsers.add_parser('special', help='Unspecified task')
+    special_parser.set_defaults(func=main_special)
 
     run_parser = subparsers.add_parser('run', help='Execute a run of the genetic algorithm')
     identity_args(run_parser)
@@ -146,6 +179,14 @@ if __name__ == "__main__":
     plot_slots_avg_parser.add_argument('-ids', '--identities', action='store', nargs='+', type=str, required=False, default=[''],
                 help='The IDs that are used to retrieve records from the database')
     plot_slots_avg_parser.set_defaults(func=main_plot)
+
+    plot_pareto_parser = plot_subparsers.add_parser('pareto', help="Plot the database pareto frontier for slot and dist fitness functions")
+    plot_pareto_parser.add_argument('-db', '--database', action='store', type=unicode, required=False, default='evolution.db',
+                help='The SQLite3 database where results will be stored (default="evolution.db")')
+    plot_pareto_parser.add_argument('-f', '--fitness', action='store', nargs=2, type=unicode, required=False,
+            choices=get_fitness_choices(), default=('slot', 'path-dist'),
+            help='The two fitness functions to plot (default: slot path-dist)')
+    plot_pareto_parser.set_defaults(func=main_plot)
 
     c_header_parser = subparsers.add_parser('c-header', help='Output a C header file containing the necessary details to be implemented')
     identity_args(c_header_parser)

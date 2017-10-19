@@ -10,7 +10,10 @@ from ga import topology
 
 def find_attacker_path(g):
     nodes = set()
-    safety_period = g.graph["safety-period"]
+    try:
+        safety_period = g.graph["safety-period"]
+    except KeyError:
+        return nodes
     safety_period = len(g.nodes()) if safety_period == 0 else safety_period
     current_node = g.graph["sink"]
     while safety_period > 0:
@@ -407,6 +410,7 @@ def crossover(genome, *args, **kwargs):
     crossover_node = father.n.graph["sink"]
     while crossover_node == father.n.graph["sink"]:
         crossover_node = rng.choice(father.n.nodes())
+    # print("Crossover node: {}, {}".format(crossover_node, father.n.node[crossover_node]['coord']))
     __one_crossover(son.n, mother.n, crossover_node)
     __one_crossover(daughter.n, father.n, crossover_node)
     return son, daughter
@@ -416,7 +420,7 @@ def mutate_nothing(genome, *args, **kwargs):
 
 #TODO Do something different when node has no children
 def mutate(genome, *args, **kwargs):
-    ga = kwargs["ga_engine"]
+    # ga = kwargs["ga_engine"]
     mutation_rate = kwargs["pmut"]
     mutation_count = 0
     for n in genome.n.nodes():
@@ -451,7 +455,7 @@ def mutate(genome, *args, **kwargs):
     return mutation_count
 
 def mutate_aggressive(genome, *args, **kwargs):
-    ga = kwargs["ga_engine"]
+    # ga = kwargs["ga_engine"]
     mutation_rate = kwargs["pmut"]
     mutation_count = 0
     for n in genome.n.nodes():
