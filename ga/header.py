@@ -3,6 +3,8 @@ from __future__ import division, print_function
 from ga import genome
 from ga.output_adapters import sqlite_retrieve_best_genome
 
+#TODO Add fitness function parameter
+
 c_header_template = """/*
  * GENERATED HEADER FILE
  * Database: {dbname}
@@ -13,6 +15,7 @@ c_header_template = """/*
 #ifndef GA_H
 #define GA_H
 
+#define GA_FITNESS_FUNCTION "{fitness_function}"
 #define GA_TOTAL_NODES {total_nodes}
 #define GA_TOTAL_SLOTS {total_slots}
 #define GA_SOURCE_ID {source_id}
@@ -50,6 +53,7 @@ def generate_c_header(dbname, id):
     output['total_slots'] = slots
     output['source_id'] = n.graph['source']
     output['sink_id'] = n.graph['sink']
+    output['fitness_function'] = ''
     output['slot_assignments'] = ", ".join([str(n.node[node]['slot']) for node in n.nodes_iter()])
     output['path_ids_length'] = len(attacker_path)
     output['path_ids'] = ", ".join([ str(a) for a in attacker_path ])
