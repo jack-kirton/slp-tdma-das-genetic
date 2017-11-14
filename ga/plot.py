@@ -183,7 +183,7 @@ def plot_slot_v_generation_avg_sqlite(dbname, ids):
 def plot_pareto_sqlite(dbname, fitness_functions):
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
-    query = "SELECT genome FROM best_individuals"
+    query = "SELECT id, generation, genome FROM best_individuals"
     result = c.execute(query)
     fig = plt.figure()
     fig.patch.set_facecolor('white')
@@ -191,24 +191,30 @@ def plot_pareto_sqlite(dbname, fitness_functions):
     fitness_function_2 = get_fitness_function(fitness_functions[1])
     fitness_X = []
     fitness_Y = []
+    fitness_name = []
     pareto_X = []
     pareto_Y = []
     for row in result:
-        g = pickle.loads(str(row[0]))
+        g = pickle.loads(str(row[2]))
         fitness_X.append(fitness_function_1(g))
         fitness_Y.append(fitness_function_2(g))
+        fitness_name.append((str(row[0]), int(row[1])))
     plt.plot(fitness_X, fitness_Y, marker='x', linestyle='none')
     plt.grid(True)
     plt.xlabel(fitness_functions[0] + " fitness")
     plt.ylabel(fitness_functions[1] + " fitness")
-    sorted_list = sorted([(fitness_X[i], fitness_Y[i]) for i in xrange(len(fitness_X))], reverse=True)
+    sorted_list = sorted([(fitness_X[i], fitness_Y[i], fitness_name[i]) for i in xrange(len(fitness_X))], reverse=True)
     pareto_front = [sorted_list[0]]
+    print('{} - {} - ({:.3}, {:.3})'.format(pareto_front[0][2][0], pareto_front[0][2][1], pareto_front[0][0], pareto_front[0][1]))
     for pair in sorted_list[1:]:
         if pair[1] >= pareto_front[-1][1]:
             pareto_front.append(pair)
+            print('{} - {} - ({:.3}, {:.3})'.format(pair[2][0], pair[2][1], pair[0], pair[1]))
     pareto_X = [ pair[0] for pair in pareto_front ]
     pareto_Y = [ pair[1] for pair in pareto_front ]
     plt.plot(pareto_X, pareto_Y)
+    plt.xlim([0, 1.1])
+    plt.ylim([0, 1.1])
     fig.show()
     c.close()
     conn.close()
