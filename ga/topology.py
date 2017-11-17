@@ -4,36 +4,6 @@ import networkx as nx
 
 from ga.restricted_eval import restricted_eval
 
-# class Topology(object):
-    # def __init__(self, sink=None, source=None):
-        # self._nodes = {}
-        # self._edges = []
-        # self._sink = sink
-        # self._source = source
-
-    # @property
-    # def nodes(self):
-        # return self._nodes
-
-    # @property
-    # def edges(self):
-        # return self._edges
-
-
-# class GridTopology(Topology):
-    # def __init__(self, width, height, sink=None, source=None):
-        # sink = (width//2, height//2) if sink is None else sink
-        # source = (0, 0) if source is None else source
-        # super(GridTopology, self).__init__(self, sink=sink, source=source)
-        # for j in xrange(height):
-            # for i in xrange(width):
-                # self._nodes[i + j*width] = (i, j)
-                # for nx, ny in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]:
-                    # if nx < 0 or nx >= width or ny < 0 or ny >= height:
-                        # continue
-                    # else:
-                        # self._edges.append( (i + j*width, nx + ny*width) )
-
 
 class Topology(object):
     def __init__(self, sink=None, source=None):
