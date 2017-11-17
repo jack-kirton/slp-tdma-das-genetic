@@ -154,6 +154,7 @@ def _get_num_records(dbname, base_id):
         return len(result)
 
 def plot_slot_v_generation_avg_sqlite(dbname, ids):
+    plt.rcParams["font.size"] = 30.0
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
     base_query = "SELECT id, generation, slots FROM best_individuals WHERE generation=?"
@@ -181,6 +182,7 @@ def plot_slot_v_generation_avg_sqlite(dbname, ids):
     conn.close()
 
 def plot_pareto_sqlite(dbname, fitness_functions):
+    plt.rcParams["font.size"] = 30.0
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
     query = "SELECT id, generation, genome FROM best_individuals"
