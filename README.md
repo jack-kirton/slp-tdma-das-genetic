@@ -6,6 +6,7 @@ The purpose of this project is to generate SLP-aware time division multiple acce
 The majority of the usage instructions can be discovered by running the `main.py` script with the `-h` option at any stage to retrieve lists of options and arguments.
 
 The main functions of the application can be executed by running `main.py` followed by one of the following:
+
 * `run`
 * `run-multiple`
 * `plot`
